@@ -5,11 +5,15 @@ import JobCard from "../components/JobCard";
 function Home() {
   const [searchTerm, setSearchTerm] = useState("");
 
+  const term = searchTerm.trim().toLowerCase();
+
   const filteredJobs = jobs.filter(
     (job) =>
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.location.toLowerCase().includes(searchTerm.toLowerCase())
+      job.title.toLowerCase().includes(term) ||
+      job.company.toLowerCase().includes(term) ||
+      job.location.toLowerCase().includes(term) ||
+      job.type.toLowerCase().includes(term) ||
+      job.experience.toLowerCase().includes(term)
   );
 
   return (
@@ -19,13 +23,18 @@ function Home() {
       {/* Search Input */}
       <input
         type="text"
-        placeholder="Search by title, company, or location..."
+        placeholder="Search by title, company, location, type, or experience..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-lg mb-6"
+        className="w-full p-2 border border-gray-300 rounded-lg mb-4"
       />
 
-      {/* Render Job Cards */}
+      {/* Result Count */}
+      <p className="text-gray-500 mb-6">
+        Showing {filteredJobs.length} of {jobs.length} jobs
+      </p>
+
+      {/* Job Listings */}
       {filteredJobs.length > 0 ? (
         <div className="space-y-4">
           {filteredJobs.map((job) => (
