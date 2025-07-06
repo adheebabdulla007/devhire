@@ -1,10 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import jobs from "../data/jobs";
 
 function JobDetail() {
-  const { id } = useParams(); // get id from URL
-  const jobId = parseInt(id); // URL params are strings
-  const job = jobs.find((job) => job.id === jobId); // find matching job
+  const { id } = useParams();
+  const jobId = parseInt(id);
+  const job = jobs.find((job) => job.id === jobId);
 
   if (!job) {
     return (
@@ -15,24 +15,37 @@ function JobDetail() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-      <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-      <p className="text-gray-600 mb-1">
-        {job.company} • {job.location}
-      </p>
-      <p className="mb-1">
-        {job.type} | {job.experience}
-      </p>
-      <p className="text-green-700 font-semibold mb-4">{job.salary}</p>
+    <section className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
+      <Link to="/" className="text-blue-600 underline mb-4 block">
+        ← Back to Job Listings
+      </Link>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Job Description</h2>
-        <p>
-          This is a placeholder for job description. You can extend the job data
-          object to include real description, skills, requirements, etc.
+      <header>
+        <h1 className="text-3xl font-bold mb-1">{job.title}</h1>
+        <p className="text-gray-600">
+          {job.company} • {job.location}
         </p>
-      </div>
-    </div>
+        <p className="text-sm text-gray-500 mb-4">Posted on: {job.posted}</p>
+        <p className="mb-2">
+          {job.type} | {job.experience}
+        </p>
+        <p className="text-green-700 font-semibold mb-6">{job.salary}</p>
+      </header>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">Job Description</h2>
+        <p className="text-gray-800">{job.description}</p>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-semibold mb-2">Requirements</h2>
+        <ul className="list-disc list-inside text-gray-800">
+          {job.requirements.map((req, index) => (
+            <li key={index}>{req}</li>
+          ))}
+        </ul>
+      </section>
+    </section>
   );
 }
 
