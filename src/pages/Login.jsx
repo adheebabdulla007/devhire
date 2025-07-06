@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
 function Login() {
@@ -18,33 +19,68 @@ function Login() {
     }));
   };
 
+  const MIN_PASSWORD_LENGTH = 6;
+
   const validate = () => {
-    const newErrors = {};
+    const errors = {};
+
+    formData.email = formData.email.toLowerCase();
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email format is invalid";
+      errors.email = "Email format is invalid";
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      errors.password = "Password is required";
+    } else if (formData.password.length < MIN_PASSWORD_LENGTH) {
+      errors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
     }
 
-    return newErrors;
+    return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validate();
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length === 0) {
-      console.log("Form Submitted:", formData);
-      // Next: API call or Firebase login here
+    if (Object.keys(validationErrors).length > 0) {
+      return; // 🔴 Stop here if form is invalid
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      const user = userCredential.user;
+      console.log("User logged in:", user);
+      alert("Login successful!");
+
+      // Optional: Reset form
+      setFormData({ email: "", password: "" });
+    } catch (error) {
+      console.error("Firebase login error:", error.code);
+
+      switch (error.code) {
+        case "auth/user-not-found":
+        case "auth/invalid-credential":
+          setErrors({ email: "No account found with this email" });
+          break;
+        case "auth/wrong-password":
+          setErrors({ password: "Incorrect password" });
+          break;
+        case "auth/invalid-email":
+          setErrors({ email: "Invalid email format" });
+          break;
+        default:
+          alert("Something went wrong. Please try again.");
+      }
     }
   };
 
