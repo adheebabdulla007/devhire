@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/context/AuthContext";
 
 const DashboardHome = () => {
   const { user, logout } = useAuth();
@@ -7,7 +7,7 @@ const DashboardHome = () => {
     try {
       await logout();
       alert("Logged out successfully!");
-      window.location.href = "/login"; // simple redirect after logout
+      window.location.href = "/login"; // ✅ redirect after logout
     } catch (error) {
       console.error("Logout error:", error.message);
       alert("Failed to log out");
@@ -15,21 +15,23 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Dashboard Home</h1>
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
 
       {user ? (
         <>
-          <p className="text-green-600 mb-2">Welcome, {user.email}</p>
+          <p className="mb-2 text-gray-800">
+            You're logged in as: <strong>{user.email}</strong>
+          </p>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
           >
             Logout
           </button>
         </>
       ) : (
-        <p className="text-red-600">You are not logged in.</p>
+        <p className="text-red-600">User not found. Please login again.</p>
       )}
     </div>
   );
