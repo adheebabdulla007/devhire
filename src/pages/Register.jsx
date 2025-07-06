@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import Button from "@/components/ui/Button";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -159,12 +160,9 @@ function Register() {
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
+        <Button type="submit" className="w-full">
           Register
-        </button>
+        </Button>
       </form>
     </main>
   );

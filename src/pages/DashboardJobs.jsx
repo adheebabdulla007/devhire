@@ -1,5 +1,6 @@
 import { useState } from "react";
 import jobsData from "@/data/jobs";
+import Button from "@/components/ui/Button";
 
 const DashboardJobs = () => {
   const [jobs, setJobs] = useState(jobsData);
@@ -26,12 +27,12 @@ const DashboardJobs = () => {
             >
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-xl font-semibold">{job.title}</h3>
-                <button
+                <Button
                   onClick={() => handleDelete(job.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                  className="bg-red-500 hover:bg-red-600 px-3 py-1 text-sm"
                 >
                   Delete
-                </button>
+                </Button>
               </div>
 
               <p className="text-sm text-gray-700">

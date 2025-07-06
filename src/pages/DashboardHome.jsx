@@ -1,15 +1,16 @@
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom"; // ✅ import useNavigate
+import { useNavigate } from "react-router-dom";
+import Button from "@/components/ui/Button";
 
 const DashboardHome = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate(); // ✅ initialize navigate
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await logout();
       alert("Logged out successfully!");
-      navigate("/login"); // ✅ SPA-friendly redirect
+      navigate("/login");
     } catch (error) {
       console.error("Logout error:", error.message);
       alert("Failed to log out");
@@ -25,12 +26,12 @@ const DashboardHome = () => {
           <p className="mb-2 text-gray-800">
             You're logged in as: <strong>{user.email}</strong>
           </p>
-          <button
+          <Button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            className="bg-red-500 hover:bg-red-600"
           >
             Logout
-          </button>
+          </Button>
         </>
       ) : (
         <p className="text-red-600">User not found. Please log in again.</p>
