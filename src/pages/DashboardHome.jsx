@@ -1,13 +1,15 @@
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom"; // ✅ import useNavigate
 
 const DashboardHome = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate(); // ✅ initialize navigate
 
   const handleLogout = async () => {
     try {
       await logout();
       alert("Logged out successfully!");
-      window.location.href = "/login"; // ✅ redirect after logout
+      navigate("/login"); // ✅ SPA-friendly redirect
     } catch (error) {
       console.error("Logout error:", error.message);
       alert("Failed to log out");
@@ -15,7 +17,7 @@ const DashboardHome = () => {
   };
 
   return (
-    <div>
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
 
       {user ? (
@@ -31,7 +33,7 @@ const DashboardHome = () => {
           </button>
         </>
       ) : (
-        <p className="text-red-600">User not found. Please login again.</p>
+        <p className="text-red-600">User not found. Please log in again.</p>
       )}
     </div>
   );
