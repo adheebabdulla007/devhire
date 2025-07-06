@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { auth } from "../firebase";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -95,5 +96,6 @@ function Login() {
     </main>
   );
 }
+console.log("Firebase Auth:", auth);
 
 export default Login;

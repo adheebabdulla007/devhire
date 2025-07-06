@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -47,15 +49,41 @@ function Register() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validate();
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      console.log("Registration Successful:", formData);
-      // Next: Send data to backend or Firebase
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        const user = userCredential.user;
+        console.log("User registered:", user);
+        alert("Registration successful!");
+
+        // Optional: Clear form
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      } catch (error) {
+        console.error("Firebase error:", error.code);
+        if (error.code === "auth/email-already-in-use") {
+          setErrors({ email: "Email already in use" });
+        } else if (error.code === "auth/weak-password") {
+          setErrors({ password: "Password is too weak" });
+        } else {
+          alert("Something went wrong. Please try again.");
+        }
+      }
     }
   };
 
