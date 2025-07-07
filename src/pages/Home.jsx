@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 const Home = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [filterType, setFilterType] = useState("all");
   const [filterLocation, setFilterLocation] = useState("");
   const [sortOption, setSortOption] = useState("newest");
@@ -14,69 +13,60 @@ const Home = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "jobs"));
-        const jobsArray = querySnapshot.docs.map((doc) => ({
+        const snapshot = await getDocs(collection(db, "jobs"));
+        const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setJobs(jobsArray);
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
+        setJobs(data);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchJobs();
   }, []);
 
-  const filteredJobs = jobs
-    .filter((job) => {
-      const matchesType = filterType === "all" || job.type === filterType;
-      const matchesLocation = job.location
-        .toLowerCase()
-        .includes(filterLocation.toLowerCase());
-      return matchesType && matchesLocation;
-    })
+  const filtered = jobs
+    .filter(
+      (job) =>
+        (filterType === "all" || job.type === filterType) &&
+        job.location.toLowerCase().includes(filterLocation.toLowerCase())
+    )
     .sort((a, b) => {
       if (sortOption === "salary") {
-        const getMinSalary = (salary) =>
-          parseInt(
-            salary.split("₹")[1]?.split("-")[0]?.trim()?.replace(/[^\d]/g, "")
-          ) || 0;
-
-        return getMinSalary(b.salary) - getMinSalary(a.salary);
-      } else {
-        return b.posted?.seconds - a.posted?.seconds; // Newest first
+        const getMin = (s) => parseInt(s.replace(/[^0-9]/g, "")) || 0;
+        return getMin(b.salary) - getMin(a.salary);
       }
+      return b.posted?.seconds - a.posted?.seconds;
     });
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold">Latest Jobs</h1>
+
       <div className="flex flex-col sm:flex-row gap-4">
         <select
+          className="border p-2 rounded"
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="border p-2 rounded"
         >
           <option value="all">All Types</option>
           <option value="Full-Time">Full-Time</option>
           <option value="Remote">Remote</option>
           <option value="Contract">Contract</option>
         </select>
-
         <input
-          type="text"
+          className="border p-2 rounded flex-1"
+          placeholder="Filter by location"
           value={filterLocation}
           onChange={(e) => setFilterLocation(e.target.value)}
-          placeholder="Filter by location"
-          className="border p-2 rounded flex-1"
         />
-
         <select
+          className="border p-2 rounded"
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          className="border p-2 rounded"
         >
           <option value="newest">Newest First</option>
           <option value="salary">Salary High to Low</option>
@@ -84,31 +74,29 @@ const Home = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading jobs...</p>
-      ) : filteredJobs.length === 0 ? (
-        <p className="text-gray-600">No jobs found.</p>
+        <p className="text-center text-gray-500">Loading jobs...</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-center text-gray-600">
+          🚫 No jobs found. Please check back later.
+        </p>
       ) : (
-        <div className="grid gap-6">
-          {filteredJobs.map((job) => (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((job) => (
             <Link
               to={`/job/${job.id}`}
               key={job.id}
-              className="border p-5 rounded-xl shadow-md hover:shadow-lg transition duration-200 block"
+              className="border p-5 rounded-xl shadow hover:shadow-lg transition duration-200 block"
             >
               <h2 className="text-xl font-bold text-indigo-700 mb-1">
                 {job.title}
               </h2>
-              <p className="text-gray-600 mb-1">
-                <strong>Company:</strong> {job.company} • <strong>Type:</strong>{" "}
-                {job.type}
-              </p>
-              <p className="text-gray-600 mb-1">
-                <strong>Location:</strong> {job.location} •{" "}
-                <strong>Experience:</strong> {job.experience}
+              <p className="text-gray-600">
+                {job.company} • {job.type}
               </p>
               <p className="text-gray-600">
-                <strong>Salary:</strong> {job.salary}
+                {job.location} • {job.experience}
               </p>
+              <p className="text-gray-600 mt-2">{job.salary}</p>
             </Link>
           ))}
         </div>

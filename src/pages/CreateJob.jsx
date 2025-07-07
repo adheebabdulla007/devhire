@@ -2,6 +2,7 @@ import { useState } from "react";
 import { db } from "@/firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import Button from "@/components/ui/Button";
 
 const CreateJob = () => {
   const [job, setJob] = useState({
@@ -110,13 +111,13 @@ const CreateJob = () => {
           rows="2"
           className="border p-2 rounded"
         />
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+          className="bg-indigo-600 hover:bg-indigo-700"
         >
           {loading ? "Posting..." : "Post Job"}
-        </button>
+        </Button>
       </form>
     </div>
   );
