@@ -1,21 +1,36 @@
-import { useState } from "react";
-import jobsData from "@/data/jobs";
-import Button from "@/components/ui/Button";
+import { useState, useEffect } from "react";
+import { db } from "@/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const DashboardJobs = () => {
-  const [jobs, setJobs] = useState(jobsData);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (id) => {
-    const confirmDelete = window.confirm("Delete this job?");
-    if (confirmDelete) {
-      setJobs(jobs.filter((job) => job.id !== id));
-    }
-  };
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        const jobsList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setJobs(jobsList);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        alert("Failed to load jobs.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  if (loading) return <p className="p-4">Loading jobs...</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Manage Your Jobs</h1>
-
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">Manage Jobs</h2>
       {jobs.length === 0 ? (
         <p className="text-gray-600">No jobs available.</p>
       ) : (
@@ -23,34 +38,40 @@ const DashboardJobs = () => {
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="border p-5 rounded-xl shadow-sm hover:shadow-md transition"
+              className="border p-5 rounded-xl shadow-md hover:shadow-lg transition duration-200"
             >
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-semibold">{job.title}</h3>
-                <Button
-                  onClick={() => handleDelete(job.id)}
-                  className="bg-red-500 hover:bg-red-600 px-3 py-1 text-sm"
-                >
-                  Delete
-                </Button>
+                <h3 className="text-xl font-semibold text-indigo-700">
+                  {job.title}
+                </h3>
               </div>
 
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-600 mb-1">
                 <strong>Company:</strong> {job.company} • <strong>Type:</strong>{" "}
-                {job.type} • <strong>Location:</strong> {job.location}
+                {job.type}
               </p>
-              <p className="text-sm text-gray-700">
-                <strong>Experience:</strong> {job.experience} •{" "}
+              <p className="text-sm text-gray-600 mb-1">
+                <strong>Location:</strong> {job.location} •{" "}
+                <strong>Experience:</strong> {job.experience}
+              </p>
+              <p className="text-sm text-gray-600 mb-1">
                 <strong>Salary:</strong> {job.salary}
               </p>
 
-              <p className="mt-2 text-gray-800">{job.description}</p>
+              <p className="text-gray-800 mt-3 mb-2">
+                <strong>Description:</strong> {job.description}
+              </p>
 
-              <ul className="list-disc list-inside text-sm mt-2 text-gray-600">
-                {job.requirements.map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
-              </ul>
+              <div className="mt-2">
+                <p className="font-semibold text-gray-700 mb-1">
+                  Requirements:
+                </p>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  {job.requirements?.map((req, index) => (
+                    <li key={index}>{req}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))}
         </div>
