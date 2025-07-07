@@ -20,7 +20,7 @@ const Home = () => {
         }));
         setJobs(data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching jobs:", err);
       } finally {
         setLoading(false);
       }
@@ -43,60 +43,132 @@ const Home = () => {
     });
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Latest Jobs</h1>
+    <div
+      style={{
+        maxWidth: "1200px",
+        margin: "0 auto",
+        padding: "2rem 1rem",
+      }}
+    >
+      <h1
+        style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}
+      >
+        Latest Jobs
+      </h1>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Filters */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1rem",
+          marginBottom: "1.5rem",
+        }}
+      >
         <select
-          className="border p-2 rounded"
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
+          style={{
+            padding: "0.5rem",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            flex: "1",
+            minWidth: "150px",
+          }}
         >
           <option value="all">All Types</option>
           <option value="Full-Time">Full-Time</option>
           <option value="Remote">Remote</option>
           <option value="Contract">Contract</option>
         </select>
+
         <input
-          className="border p-2 rounded flex-1"
+          type="text"
           placeholder="Filter by location"
           value={filterLocation}
           onChange={(e) => setFilterLocation(e.target.value)}
+          style={{
+            padding: "0.5rem",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            flex: "2",
+            minWidth: "200px",
+          }}
         />
+
         <select
-          className="border p-2 rounded"
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
+          style={{
+            padding: "0.5rem",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            flex: "1",
+            minWidth: "150px",
+          }}
         >
           <option value="newest">Newest First</option>
           <option value="salary">Salary High to Low</option>
         </select>
       </div>
 
+      {/* Job Listings */}
       {loading ? (
-        <p className="text-center text-gray-500">Loading jobs...</p>
+        <p style={{ textAlign: "center", color: "#888" }}>Loading jobs...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-center text-gray-600">
+        <p style={{ textAlign: "center", color: "#888" }}>
           🚫 No jobs found. Please check back later.
         </p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+          }}
+        >
           {filtered.map((job) => (
             <Link
               to={`/job/${job.id}`}
               key={job.id}
-              className="border p-5 rounded-xl shadow hover:shadow-lg transition duration-200 block"
+              style={{
+                display: "block",
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                padding: "1.5rem",
+                textDecoration: "none",
+                color: "#333",
+                backgroundColor: "#fff",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0,0,0,0.08)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)")
+              }
             >
-              <h2 className="text-xl font-bold text-indigo-700 mb-1">
+              <h2
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                  color: "#6366F1", // Indigo
+                  marginBottom: "0.5rem",
+                }}
+              >
                 {job.title}
               </h2>
-              <p className="text-gray-600">
+              <p style={{ color: "#555", marginBottom: "0.3rem" }}>
                 {job.company} • {job.type}
               </p>
-              <p className="text-gray-600">
+              <p style={{ color: "#555", marginBottom: "0.3rem" }}>
                 {job.location} • {job.experience}
               </p>
-              <p className="text-gray-600 mt-2">{job.salary}</p>
+              <p style={{ fontWeight: "500", color: "#10B981" }}>
+                {job.salary}
+              </p>
             </Link>
           ))}
         </div>

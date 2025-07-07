@@ -24,14 +24,50 @@ const JobDetail = () => {
     fetch();
   }, [id]);
 
-  if (loading) return <p className="p-6 text-center">Loading job details...</p>;
+  if (loading)
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>
+        Loading job details...
+      </div>
+    );
+
   if (!job)
-    return <p className="p-6 text-center text-red-600">Job not found.</p>;
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
+        Job not found.
+      </div>
+    );
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-4">
-      <h1 className="text-3xl font-bold">{job.title}</h1>
-      <div className="text-sm text-gray-600 space-y-1">
+    <div
+      style={{
+        maxWidth: "720px",
+        margin: "0 auto",
+        padding: "2rem 1rem",
+        background: "#fff",
+        borderRadius: "10px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "1.8rem",
+          fontWeight: "bold",
+          marginBottom: "1rem",
+          color: "#333",
+        }}
+      >
+        {job.title}
+      </h1>
+
+      <div
+        style={{
+          fontSize: "0.95rem",
+          color: "#555",
+          marginBottom: "1.5rem",
+          lineHeight: "1.6",
+        }}
+      >
         <p>
           <strong>Company:</strong> {job.company}
         </p>
@@ -49,14 +85,39 @@ const JobDetail = () => {
         </p>
       </div>
 
-      <div className="mt-4">
-        <h2 className="font-semibold">Description</h2>
-        <p className="text-gray-800">{job.description}</p>
+      <div style={{ marginBottom: "1.5rem" }}>
+        <h2
+          style={{
+            fontSize: "1.2rem",
+            fontWeight: "600",
+            marginBottom: "0.5rem",
+            color: "#444",
+          }}
+        >
+          Description
+        </h2>
+        <p style={{ color: "#333", lineHeight: "1.7" }}>{job.description}</p>
       </div>
 
       <div>
-        <h2 className="font-semibold">Requirements</h2>
-        <ul className="list-disc list-inside text-gray-800">
+        <h2
+          style={{
+            fontSize: "1.2rem",
+            fontWeight: "600",
+            marginBottom: "0.5rem",
+            color: "#444",
+          }}
+        >
+          Requirements
+        </h2>
+        <ul
+          style={{
+            paddingLeft: "1.25rem",
+            listStyle: "disc",
+            color: "#333",
+            lineHeight: "1.6",
+          }}
+        >
           {job.requirements.map((r, i) => (
             <li key={i}>{r}</li>
           ))}

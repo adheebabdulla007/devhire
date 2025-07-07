@@ -18,23 +18,20 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
+    <div className="dashboard-home">
+      <h1 className="dashboard-title">Welcome to DevHire Dashboard</h1>
 
       {user ? (
         <>
-          <p className="mb-2 text-gray-800">
-            You're logged in as: <strong>{user.email}</strong>
+          <p className="dashboard-subtitle">
+            You are logged in as <strong>{user.email}</strong>
           </p>
-          <Button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600"
-          >
+          <Button className="logout-button" onClick={handleLogout}>
             Logout
           </Button>
         </>
       ) : (
-        <p className="text-red-600">User not found. Please log in again.</p>
+        <p className="text-error">User not found. Please log in again.</p>
       )}
     </div>
   );

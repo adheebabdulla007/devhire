@@ -21,48 +21,51 @@ const DashboardJobs = () => {
   const perPage = 5;
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchJobs = async () => {
       try {
         const q = query(collection(db, "jobs"), orderBy("posted", "desc"));
         const snap = await getDocs(q);
-        setJobs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setJobs(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching jobs:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+
+    fetchJobs();
   }, []);
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm("Are you sure you want to delete this job?")) return;
     try {
       await deleteDoc(doc(db, "jobs", id));
-      setJobs((p) => p.filter((j) => j.id !== id));
+      setJobs((prev) => prev.filter((job) => job.id !== id));
     } catch (err) {
-      console.error(err);
-      alert("Delete failed");
+      console.error("Error deleting job:", err);
+      alert("Failed to delete job.");
     }
   };
 
-  const toggleStatus = async (id, s) => {
+  const toggleStatus = async (id, status) => {
+    const newStatus = status === "active" ? "inactive" : "active";
     try {
-      const newSt = s === "active" ? "inactive" : "active";
-      await updateDoc(doc(db, "jobs", id), { status: newSt });
-      setJobs((p) => p.map((j) => (j.id === id ? { ...j, status: newSt } : j)));
+      await updateDoc(doc(db, "jobs", id), { status: newStatus });
+      setJobs((prev) =>
+        prev.map((job) => (job.id === id ? { ...job, status: newStatus } : job))
+      );
     } catch {
-      alert("Status update failed");
+      alert("Failed to update job status.");
     }
   };
 
   const filtered = jobs
     .filter(
-      (j) =>
-        j.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        j.company.toLowerCase().includes(searchTerm.toLowerCase())
+      (job) =>
+        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.company.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .filter((j) => (typeFilter ? j.type === typeFilter : true));
+    .filter((job) => (typeFilter ? job.type === typeFilter : true));
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const current = filtered.slice(
@@ -71,19 +74,41 @@ const DashboardJobs = () => {
   );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Manage Jobs</h2>
-      <div className="flex flex-wrap gap-4 mb-6">
+    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto" }}>
+      <h2
+        style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}
+      >
+        Manage Jobs
+      </h2>
+
+      {/* Filters */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1rem",
+          marginBottom: "2rem",
+        }}
+      >
         <input
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by title or company..."
-          className="border p-2 rounded flex-1"
+          style={{
+            flex: 1,
+            padding: "0.6rem",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+          }}
         />
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="border p-2 rounded"
+          style={{
+            padding: "0.6rem",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+          }}
         >
           <option value="">All Types</option>
           <option>Full-Time</option>
@@ -92,23 +117,39 @@ const DashboardJobs = () => {
         </select>
       </div>
 
+      {/* Job Cards */}
       {loading ? (
         <p>Loading jobs...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-center text-gray-600">
-          You haven't posted any jobs yet. Start by creating your first one!
+        <p style={{ textAlign: "center", color: "#777" }}>
+          🚫 No jobs found. Start by posting your first job.
         </p>
       ) : (
         <>
-          <div className="space-y-6">
+          <div style={{ display: "grid", gap: "1.5rem" }}>
             {current.map((job) => (
               <div
                 key={job.id}
-                className="border p-5 rounded-xl shadow hover:shadow-lg transition"
+                style={{
+                  border: "1px solid #ddd",
+                  borderRadius: "10px",
+                  padding: "1.5rem",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                  transition: "0.2s ease",
+                }}
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-xl font-semibold">{job.title}</h3>
-                  <div className="space-x-2">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: 600 }}>
+                    {job.title}
+                  </h3>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
                     <Button
                       onClick={() =>
                         toggleStatus(job.id, job.status || "active")
@@ -129,13 +170,14 @@ const DashboardJobs = () => {
                     </Button>
                   </div>
                 </div>
-                <p className="text-gray-700">
-                  {job.company} • {job.type}
+
+                <p style={{ color: "#555" }}>
+                  <strong>{job.company}</strong> • {job.type}
                 </p>
-                <p className="text-gray-700">
+                <p style={{ color: "#555" }}>
                   {job.location} • {job.experience}
                 </p>
-                <p className="text-gray-700">
+                <p style={{ fontSize: "0.9rem", color: "#888" }}>
                   Posted{" "}
                   {formatDistanceToNow(job.posted.toDate(), {
                     addSuffix: true,
@@ -145,17 +187,25 @@ const DashboardJobs = () => {
             ))}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-6 flex justify-center gap-2">
+            <div
+              style={{
+                marginTop: "2rem",
+                display: "flex",
+                justifyContent: "center",
+                gap: "0.5rem",
+              }}
+            >
               {Array.from({ length: totalPages }, (_, i) => (
                 <Button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 text-sm ${
+                  className={
                     currentPage === i + 1
                       ? "bg-indigo-600 text-white"
                       : "bg-gray-200 text-gray-800"
-                  }`}
+                  }
                 >
                   {i + 1}
                 </Button>
