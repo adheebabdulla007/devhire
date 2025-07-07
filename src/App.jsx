@@ -12,15 +12,15 @@ import SavedJobs from "./pages/SavedJobs";
 import DashboardHome from "./pages/DashboardHome";
 import DashboardJobs from "./pages/DashboardJobs";
 import CreateJob from "./pages/CreateJob";
-import Applicants from "./pages/Applicants";
-import DashboardLayout from "./layouts/DashboardLayout"; // ✅ IMPORT
+// import Applicants from "./pages/Applicants";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
-        {/* ✅ PUBLIC ROUTES */}
+        {/*  PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
         <Route path="/job/:id" element={<JobDetail />} />
         <Route path="/login" element={<Login />} />
@@ -28,7 +28,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved" element={<SavedJobs />} />
 
-        {/* ✅ PROTECTED DASHBOARD ROUTES WITH LAYOUT */}
+        {/*  PROTECTED DASHBOARD ROUTES WITH LAYOUT */}
         <Route
           path="/dashboard"
           element={
@@ -40,7 +40,7 @@ function App() {
           <Route index element={<DashboardHome />} />
           <Route path="jobs" element={<DashboardJobs />} />
           <Route path="create" element={<CreateJob />} />
-          <Route path="applicants/:id" element={<Applicants />} />
+          {/* <Route path="applicants/:id" element={<Applicants />} />*/}
         </Route>
       </Routes>
     </BrowserRouter>
