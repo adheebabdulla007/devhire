@@ -1,51 +1,60 @@
-import { useState } from "react";
-import jobs from "../data/jobs";
-import JobCard from "../components/JobCard";
+import { useEffect, useState } from "react";
+import { db } from "@/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { Link } from "react-router-dom";
 
-function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
+const Home = () => {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const term = searchTerm.trim().toLowerCase();
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        const jobsArray = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setJobs(jobsArray);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredJobs = jobs.filter(
-    (job) =>
-      job.title.toLowerCase().includes(term) ||
-      job.company.toLowerCase().includes(term) ||
-      job.location.toLowerCase().includes(term) ||
-      job.type.toLowerCase().includes(term) ||
-      job.experience.toLowerCase().includes(term)
-  );
+    fetchJobs();
+  }, []);
+
+  if (loading) return <p className="p-6">Loading jobs...</p>;
+  if (jobs.length === 0) return <p className="p-6">No jobs found.</p>;
 
   return (
-    <main className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">Latest Job Listings</h1>
-
-      {/* Search Input */}
-      <input
-        type="text"
-        placeholder="Search by title, company, location, type, or experience..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-      />
-
-      {/* Result Count */}
-      <p className="text-gray-500 mb-6">
-        Showing {filteredJobs.length} of {jobs.length} jobs
-      </p>
-
-      {/* Job Listings */}
-      {filteredJobs.length > 0 ? (
-        <div className="space-y-4">
-          {filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-500">No jobs found for your search.</p>
-      )}
-    </main>
+    <div className="p-6 grid gap-6">
+      {jobs.map((job) => (
+        <Link
+          to={`/job/${job.id}`}
+          key={job.id}
+          className="border p-5 rounded-xl shadow-md hover:shadow-lg transition duration-200 block"
+        >
+          <h2 className="text-xl font-bold text-indigo-700 mb-1">
+            {job.title}
+          </h2>
+          <p className="text-gray-600 mb-1">
+            <strong>Company:</strong> {job.company} • <strong>Type:</strong>{" "}
+            {job.type}
+          </p>
+          <p className="text-gray-600 mb-1">
+            <strong>Location:</strong> {job.location} •{" "}
+            <strong>Experience:</strong> {job.experience}
+          </p>
+          <p className="text-gray-600">
+            <strong>Salary:</strong> {job.salary}
+          </p>
+        </Link>
+      ))}
+    </div>
   );
-}
+};
 
 export default Home;

@@ -10,6 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
 const DashboardJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -129,9 +130,12 @@ const DashboardJobs = () => {
               className="border p-5 rounded-xl shadow hover:shadow-lg transition"
             >
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-semibold text-indigo-700">
+                <Link
+                  to={`/job/${job.id}`}
+                  className="text-xl font-semibold text-indigo-700 hover:underline"
+                >
                   {job.title}
-                </h3>
+                </Link>
                 <div className="space-x-2">
                   <button
                     onClick={() => toggleStatus(job.id, job.status || "active")}
